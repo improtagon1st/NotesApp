@@ -22,7 +22,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
     // Слушатели кликов
     private OnItemClickListener clickListener;
     private OnFavoriteClickListener favListener;
-    private OnLockClickListener lockListener;
 
     @NonNull
     @Override
@@ -47,37 +46,23 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
 
         // Иконка «избранное»
         int favRes = note.isFavorite()
-                ? R.drawable.ic_star    // закрашенная звезда
+                ? R.drawable.ic_star        // закрашенная звезда
                 : R.drawable.ic_star_border; // контур звезды
         holder.imageFavorite.setImageResource(favRes);
 
-        // Иконка «замок»
-        int lockRes = note.isLocked()
-                ? R.drawable.ic_lock     // закрытый замок
-                : R.drawable.ic_lock_open; // открытый замок
-        holder.imageLock.setImageResource(lockRes);
-
         // Клик по карточке — открытие/редактирование
         holder.itemView.setOnClickListener(v -> {
-            if (clickListener != null &&
-                    holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
-                clickListener.onItemClick(note);
+            int pos = holder.getAdapterPosition();
+            if (clickListener != null && pos != RecyclerView.NO_POSITION) {
+                clickListener.onItemClick(notes.get(pos));
             }
         });
 
         // Клик по «звёздочке» — переключение избранного
         holder.imageFavorite.setOnClickListener(v -> {
-            if (favListener != null &&
-                    holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
-                favListener.onFavoriteClick(note);
-            }
-        });
-
-        // Клик по замочку — блокировка/разблокировка
-        holder.imageLock.setOnClickListener(v -> {
-            if (lockListener != null &&
-                    holder.getAdapterPosition() != RecyclerView.NO_POSITION) {
-                lockListener.onLockClick(note);
+            int pos = holder.getAdapterPosition();
+            if (favListener != null && pos != RecyclerView.NO_POSITION) {
+                favListener.onFavoriteClick(notes.get(pos));
             }
         });
     }
@@ -114,26 +99,17 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
         this.favListener = listener;
     }
 
-    public interface OnLockClickListener {
-        void onLockClick(Note note);
-    }
-    public void setOnLockClickListener(OnLockClickListener listener) {
-        this.lockListener = listener;
-    }
-
     /** ViewHolder для одной карточки заметки */
     static class NoteHolder extends RecyclerView.ViewHolder {
         TextView textViewTitle;
         TextView textViewDate;
         ImageView imageFavorite;
-        ImageView imageLock;
 
         public NoteHolder(@NonNull View itemView) {
             super(itemView);
-            textViewTitle    = itemView.findViewById(R.id.text_view_title);
-            textViewDate     = itemView.findViewById(R.id.text_view_date);
-            imageFavorite    = itemView.findViewById(R.id.image_favorite);
-            imageLock        = itemView.findViewById(R.id.image_lock);
+            textViewTitle = itemView.findViewById(R.id.text_view_title);
+            textViewDate  = itemView.findViewById(R.id.text_view_date);
+            imageFavorite = itemView.findViewById(R.id.image_favorite);
         }
     }
 }

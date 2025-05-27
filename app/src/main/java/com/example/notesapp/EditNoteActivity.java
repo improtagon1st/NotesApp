@@ -1,3 +1,4 @@
+// EditNoteActivity.java
 package com.example.notesapp;
 
 import android.content.Intent;
@@ -6,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -25,20 +25,20 @@ import io.noties.markwon.linkify.LinkifyPlugin;
 
 public class EditNoteActivity extends AppCompatActivity {
 
-    public static final String EXTRA_ID          = "com.example.notesapp.EXTRA_ID";
-    public static final String EXTRA_TITLE       = "com.example.notesapp.EXTRA_TITLE";
-    public static final String EXTRA_CONTENT     = "com.example.notesapp.EXTRA_CONTENT";
-    public static final String EXTRA_IS_FAVORITE = "com.example.notesapp.EXTRA_IS_FAVORITE";
+    public static final String EXTRA_ID           = "com.example.notesapp.EXTRA_ID";
+    public static final String EXTRA_TITLE        = "com.example.notesapp.EXTRA_TITLE";
+    public static final String EXTRA_CONTENT      = "com.example.notesapp.EXTRA_CONTENT";
+    public static final String EXTRA_IS_FAVORITE  = "com.example.notesapp.EXTRA_IS_FAVORITE";
 
-    private EditText       editTextTitle;
-    private EditText       editMarkdown;
-    private LinearLayout   formatPanel;
-    private TabLayout      tabs;
-    private ScrollView     scrollPreview;
-    private TextView       textPreview;
-    private Button         buttonSave;
-    private FrameLayout    editContainer;
-    private Markwon        markwon;
+    private EditText     editTextTitle;
+    private EditText     editMarkdown;
+    private LinearLayout formatPanel;
+    private TabLayout    tabs;
+    private ScrollView   scrollPreview;
+    private TextView     textPreview;
+    private Button       buttonSave;
+    private FrameLayout  editContainer;
+    private Markwon      markwon;
 
     private int     noteId;
     private boolean noteFav;
@@ -68,10 +68,10 @@ public class EditNoteActivity extends AppCompatActivity {
 
         // 3) Получаем данные из MainActivity
         Intent in = getIntent();
-        noteId   = in.getIntExtra(EXTRA_ID, -1);
+        noteId      = in.getIntExtra(EXTRA_ID, -1);
         String title   = in.getStringExtra(EXTRA_TITLE);
         String content = in.getStringExtra(EXTRA_CONTENT);
-        noteFav  = in.getBooleanExtra(EXTRA_IS_FAVORITE, false);
+        noteFav     = in.getBooleanExtra(EXTRA_IS_FAVORITE, false);
 
         if (title != null) {
             editTextTitle.setText(title);
@@ -85,13 +85,12 @@ public class EditNoteActivity extends AppCompatActivity {
         tabs.addTab(tabs.newTab().setText("Редактор"));
         tabs.addTab(tabs.newTab().setText("Превью"));
 
-        // По умолчанию — Превью
+        // По умолчанию — «Превью»
         tabs.getTabAt(1).select();
         enterPreviewMode();
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
+            @Override public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
                     enterEditMode();
                 } else {
@@ -102,7 +101,7 @@ public class EditNoteActivity extends AppCompatActivity {
             @Override public void onTabReselected(TabLayout.Tab tab) { }
         });
 
-        // 5) Клик по любой области preview — переходим в редактор
+        // 5) Клик по превью-контейнеру — переходим в редактор
         editContainer.setOnClickListener(v -> {
             if (tabs.getSelectedTabPosition() == 1) {
                 tabs.selectTab(tabs.getTabAt(0));
@@ -129,16 +128,15 @@ public class EditNoteActivity extends AppCompatActivity {
                 return;
             }
             Intent data = new Intent();
-            data.putExtra(EXTRA_ID,           noteId);
-            data.putExtra(EXTRA_TITLE,        newTitle);
-            data.putExtra(EXTRA_CONTENT,      newContent);
-            data.putExtra(EXTRA_IS_FAVORITE,  noteFav);
+            data.putExtra(EXTRA_ID,          noteId);
+            data.putExtra(EXTRA_TITLE,       newTitle);
+            data.putExtra(EXTRA_CONTENT,     newContent);
+            data.putExtra(EXTRA_IS_FAVORITE, noteFav);
             setResult(RESULT_OK, data);
             finish();
         });
     }
 
-    /** Переключаемся в режим редактирования **/
     private void enterEditMode() {
         editTextTitle.setEnabled(true);
         editMarkdown.setVisibility(View.VISIBLE);
@@ -146,7 +144,6 @@ public class EditNoteActivity extends AppCompatActivity {
         formatPanel.setVisibility(View.VISIBLE);
     }
 
-    /** Переключаемся в режим превью **/
     private void enterPreviewMode() {
         editTextTitle.setEnabled(false);
         markwon.setMarkdown(textPreview, editMarkdown.getText().toString());
@@ -155,21 +152,15 @@ public class EditNoteActivity extends AppCompatActivity {
         formatPanel.setVisibility(View.GONE);
     }
 
-    /**
-     * Вставляет в EditText перед текстом before и after,
-     * сохраняя выделение
-     */
     private void insertMarkdownAtCursor(EditText et, String before, String after) {
         int start = et.getSelectionStart();
         int end   = et.getSelectionEnd();
         String text = et.getText().toString();
-
         String updated = text.substring(0, start)
                 + before
                 + text.substring(start, end)
                 + after
                 + text.substring(end);
-
         et.setText(updated);
         int selStart = start + before.length();
         int selEnd   = selStart + (end - start);

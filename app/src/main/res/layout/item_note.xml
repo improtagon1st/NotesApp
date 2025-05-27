@@ -45,18 +45,6 @@
             android:contentDescription="@string/cd_favorite"
             app:srcCompat="@drawable/ic_star_border"
             app:tint="?attr/colorOnSurface"
-            app:layout_constraintEnd_toStartOf="@+id/image_lock"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <!-- Иконка «замок» -->
-        <ImageView
-            android:id="@+id/image_lock"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:padding="4dp"
-            android:contentDescription="@string/cd_lock"
-            app:srcCompat="@drawable/ic_lock"
-            app:tint="?attr/colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 

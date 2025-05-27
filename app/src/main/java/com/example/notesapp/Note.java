@@ -24,8 +24,7 @@ public class Note {
     private boolean favorite;
 
     // добавляем флаг «заблокирована»
-    @ColumnInfo(name = "is_locked")
-    private boolean locked;
+
 
     // Полный конструктор
     public Note(String title,
@@ -37,7 +36,7 @@ public class Note {
         this.content = content;
         this.lastUpdated = lastUpdated;
         this.favorite = favorite;
-        this.locked = locked;
+
     }
 
     // Пустой конструктор для Room
@@ -60,6 +59,5 @@ public class Note {
     public boolean isFavorite() { return favorite; }
     public void setFavorite(boolean favorite) { this.favorite = favorite; }
 
-    public boolean isLocked() { return locked; }
-    public void setLocked(boolean locked) { this.locked = locked; }
+
 }

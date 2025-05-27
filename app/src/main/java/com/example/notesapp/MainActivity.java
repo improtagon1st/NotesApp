@@ -1,12 +1,11 @@
+
+// MainActivity.java
 package com.example.notesapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,22 +53,10 @@ public class MainActivity extends AppCompatActivity {
         // 2) ViewModel
         notesViewModel = new ViewModelProvider(this).get(NotesViewModel.class);
 
-        // 3) Клик по элементу — открываем редактор (с проверкой PIN)
-        adapter.setOnItemClickListener(note -> {
-            if (note.isLocked()) {
-                showEnterPinDialog(entered -> {
-                    if (entered.equals(PinManager.getPin(this))) {
-                        openEditor(note);
-                    } else {
-                        Toast.makeText(this, "Неверный PIN", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
-                openEditor(note);
-            }
-        });
+        // 3) Клик по элементу — просто открываем редактор
+        adapter.setOnItemClickListener(note -> openEditor(note));
 
-        // 4) Клик по «избранному» — переключаем флаг, обновляем список
+        // 4) Клик по «избранному»
         adapter.setOnFavoriteClickListener(note -> {
             boolean newFav = !note.isFavorite();
             note.setFavorite(newFav);
@@ -83,25 +69,7 @@ public class MainActivity extends AppCompatActivity {
             invalidateOptionsMenu();
         });
 
-        // 5) Клик по «замочку» — устанавливаем/вводим PIN, меняем флаг locked
-        adapter.setOnLockClickListener(note -> {
-            if (!PinManager.hasPin(this)) {
-                showSetPinDialog(pin -> {
-                    PinManager.savePin(this, pin);
-                    toggleLock(note);
-                });
-            } else {
-                showEnterPinDialog(entered -> {
-                    if (entered.equals(PinManager.getPin(this))) {
-                        toggleLock(note);
-                    } else {
-                        Toast.makeText(this, "Неверный PIN", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-        // 6) Свайп-влево — проверяем блокировку и подтверждаем удаление
+        // 5) Свайп-влево — подтверждение и удаление
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override public boolean onMove(@NonNull RecyclerView rv,
                                             @NonNull RecyclerView.ViewHolder vh,
@@ -113,37 +81,32 @@ public class MainActivity extends AppCompatActivity {
                 Note noteToDelete = adapter.getNoteAt(pos);
                 adapter.notifyItemChanged(pos); // отменяем визуальный свайп
 
-                if (noteToDelete.isLocked()) {
-                    // запрос PIN перед удалением
-                    showEnterPinDialog(entered -> {
-                        if (entered.equals(PinManager.getPin(MainActivity.this))) {
-                            confirmDelete(noteToDelete);
-                        } else {
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    "Неверный PIN, удаление отменено",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                } else {
-                    confirmDelete(noteToDelete);
-                }
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Подтвердите удаление")
+                        .setMessage("Вы уверены, что хотите удалить эту заметку?")
+                        .setPositiveButton("Да", (dlg, which) -> {
+                            notesViewModel.delete(noteToDelete);
+                            Toast.makeText(MainActivity.this,
+                                    "Заметка удалена", Toast.LENGTH_SHORT).show();
+                            loadNotes();
+                            invalidateOptionsMenu();
+                        })
+                        .setNegativeButton("Отмена", (dlg, which) -> dlg.dismiss())
+                        .show();
             }
         }).attachToRecyclerView(rv);
 
-        // 7) FAB — создание новой заметки
+        // 6) FAB — создание новой заметки
         FloatingActionButton fab = findViewById(R.id.button_add_note);
         fab.setOnClickListener(v -> startActivityForResult(
                 new Intent(this, EditNoteActivity.class),
                 ADD_NOTE_REQUEST
         ));
 
-        // 8) Первичный показ списка
+        // 7) Первичный показ списка
         loadNotes();
     }
 
-    /** Загружает список заметок в зависимости от фильтра и поиска */
     private void loadNotes() {
         if (notesLiveData != null) {
             notesLiveData.removeObservers(this);
@@ -158,10 +121,11 @@ public class MainActivity extends AppCompatActivity {
         notesLiveData.observe(this, notes -> adapter.setNotes(notes));
     }
 
-    /** Меню: поиск и переключение «Избранное» */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        // SearchView
         MenuItem si = menu.findItem(R.id.action_search);
         SearchView sv = (SearchView) si.getActionView();
         sv.setQueryHint("Поиск заметок…");
@@ -177,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        // Обновляем иконку и заголовок ActionBar
-        MenuItem fav = menu.findItem(R.id.action_favorite);
-        updateFavoriteUi(fav);
+
+        // Обновляем иконку/заголовок «Избранные»
+        updateFavoriteUi(menu.findItem(R.id.action_favorite));
         return true;
     }
 
@@ -205,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Обрабатывает результат из Add/Edit */
     @Override
     protected void onActivityResult(int req, int res, @Nullable Intent data) {
         super.onActivityResult(req, res, data);
@@ -220,17 +183,17 @@ public class MainActivity extends AppCompatActivity {
             notesViewModel.insert(new Note(title, content, ts, isFav, false));
             Toast.makeText(this, "Заметка сохранена", Toast.LENGTH_SHORT).show();
             showFavorites = false;
-        }
-        else if (req == EDIT_NOTE_REQUEST) {
+        } else if (req == EDIT_NOTE_REQUEST) {
             int id = data.getIntExtra(EditNoteActivity.EXTRA_ID, -1);
-            if (id == -1) {
-                Toast.makeText(this, "Ошибка обновления", Toast.LENGTH_SHORT).show();
-            } else {
+            if (id != -1) {
                 Note n = new Note(title, content, ts, isFav, false);
+
                 n.setId(id);
                 notesViewModel.update(n);
                 Toast.makeText(this, "Заметка обновлена", Toast.LENGTH_SHORT).show();
                 showFavorites = isFav;
+            } else {
+                Toast.makeText(this, "Ошибка обновления", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -239,15 +202,6 @@ public class MainActivity extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
-    /** Переключает флаг locked и сохраняет */
-    private void toggleLock(Note note) {
-        note.setLocked(!note.isLocked());
-        notesViewModel.update(note);
-        loadNotes();
-        invalidateOptionsMenu();
-    }
-
-    /** Запускает EditNoteActivity */
     private void openEditor(Note note) {
         Intent i = new Intent(this, EditNoteActivity.class);
         i.putExtra(EditNoteActivity.EXTRA_ID, note.getId());
@@ -255,65 +209,5 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra(EditNoteActivity.EXTRA_CONTENT, note.getContent());
         i.putExtra(EditNoteActivity.EXTRA_IS_FAVORITE, note.isFavorite());
         startActivityForResult(i, EDIT_NOTE_REQUEST);
-    }
-
-    /** Запрос ввода PIN */
-    private void showEnterPinDialog(Consumer<String> onEntered) {
-        EditText pinInput = new EditText(this);
-        pinInput.setInputType(
-                InputType.TYPE_CLASS_NUMBER |
-                        InputType.TYPE_NUMBER_VARIATION_PASSWORD
-        );
-        pinInput.setHint("••••");
-        new AlertDialog.Builder(this)
-                .setTitle("Введите PIN")
-                .setView(pinInput)
-                .setPositiveButton("OK", (d, w) ->
-                        onEntered.accept(pinInput.getText().toString())
-                )
-                .setNegativeButton("Отмена", null)
-                .show();
-    }
-
-    /** Диалог установки PIN */
-    private void showSetPinDialog(Consumer<String> onPinSet) {
-        View v = getLayoutInflater().inflate(R.layout.dialog_set_pin, null);
-        EditText p1 = v.findViewById(R.id.pin1);
-        EditText p2 = v.findViewById(R.id.pin2);
-        new AlertDialog.Builder(this)
-                .setTitle("Установите PIN")
-                .setView(v)
-                .setPositiveButton("OK", (d, w) -> {
-                    String s1 = p1.getText().toString();
-                    String s2 = p2.getText().toString();
-                    if (s1.length() == 4 && s1.equals(s2)) {
-                        onPinSet.accept(s1);
-                    } else {
-                        Toast.makeText(this,
-                                "PIN должен состоять из 4 цифр и совпадать",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Отмена", null)
-                .show();
-    }
-
-    /** Подтверждение удаления */
-    private void confirmDelete(Note note) {
-        new AlertDialog.Builder(this)
-                .setTitle("Подтвердите удаление")
-                .setMessage("Вы уверены, что хотите удалить эту заметку?")
-                .setPositiveButton("Да", (dlg, which) -> {
-                    notesViewModel.delete(note);
-                    Toast.makeText(
-                            MainActivity.this,
-                            "Заметка удалена",
-                            Toast.LENGTH_SHORT
-                    ).show();
-                    loadNotes();
-                    invalidateOptionsMenu();
-                })
-                .setNegativeButton("Отмена", null)
-                .show();
     }
 }
