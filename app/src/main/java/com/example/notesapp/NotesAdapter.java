@@ -19,7 +19,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
 
     private List<Note> notes = new ArrayList<>();
 
-    // Слушатели кликов
     private OnItemClickListener clickListener;
     private OnFavoriteClickListener favListener;
 
@@ -35,22 +34,19 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
     public void onBindViewHolder(@NonNull NoteHolder holder, int position) {
         Note note = notes.get(position);
 
-        // Заголовок
         holder.textViewTitle.setText(note.getTitle());
 
-        // Дата последнего обновления
         String formattedDate = new SimpleDateFormat(
                 "dd.MM.yyyy HH:mm", Locale.getDefault())
                 .format(new Date(note.getLastUpdated()));
         holder.textViewDate.setText(formattedDate);
 
-        // Иконка «избранное»
         int favRes = note.isFavorite()
-                ? R.drawable.ic_star        // закрашенная звезда
-                : R.drawable.ic_star_border; // контур звезды
+                ? R.drawable.ic_star
+                : R.drawable.ic_star_border;
         holder.imageFavorite.setImageResource(favRes);
 
-        // Клик по карточке — открытие/редактирование
+        // клик по карточке — открытие/редактирование
         holder.itemView.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (clickListener != null && pos != RecyclerView.NO_POSITION) {
@@ -58,7 +54,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
             }
         });
 
-        // Клик по «звёздочке» — переключение избранного
+        // клик по «звёздочке» — переключение избранного
         holder.imageFavorite.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (favListener != null && pos != RecyclerView.NO_POSITION) {
@@ -72,18 +68,17 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
         return notes.size();
     }
 
-    /** Обновить список заметок */
+
     public void setNotes(List<Note> notes) {
         this.notes = notes;
         notifyDataSetChanged();
     }
 
-    /** Получить заметку по позиции (для swipe и т.д.) */
+
     public Note getNoteAt(int position) {
         return notes.get(position);
     }
 
-    // Интерфейсы слушателей
 
     public interface OnItemClickListener {
         void onItemClick(Note note);
@@ -99,7 +94,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
         this.favListener = listener;
     }
 
-    /** ViewHolder для одной карточки заметки */
+
     static class NoteHolder extends RecyclerView.ViewHolder {
         TextView textViewTitle;
         TextView textViewDate;

@@ -13,12 +13,10 @@ public class NotesRepository {
     private LiveData<List<Note>> allNotes;
     private LiveData<List<Note>> favoriteNotes;
 
-    // Пул потоков для операций с БД
     private static final int NUMBER_OF_THREADS = 4;
     static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    // Конструктор: получаем DAO из нашей базы
     public NotesRepository(Application application) {
         NotesDatabase db = NotesDatabase.getInstance(application);
         noteDao = db.noteDao();
@@ -26,7 +24,6 @@ public class NotesRepository {
         favoriteNotes = noteDao.getFavoriteNotes();
     }
 
-    // Методы для ViewModel
     public LiveData<List<Note>> getAllNotes() {
         return allNotes;
     }

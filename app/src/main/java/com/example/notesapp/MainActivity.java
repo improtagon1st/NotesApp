@@ -1,5 +1,3 @@
-
-// MainActivity.java
 package com.example.notesapp;
 
 import android.content.Intent;
@@ -43,20 +41,19 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // 1) RecyclerView + Adapter
+        // recyclerView + adapter
         RecyclerView rv = findViewById(R.id.recycler_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setHasFixedSize(true);
         adapter = new NotesAdapter();
         rv.setAdapter(adapter);
 
-        // 2) ViewModel
         notesViewModel = new ViewModelProvider(this).get(NotesViewModel.class);
 
-        // 3) Клик по элементу — просто открываем редактор
+        // клик по элементу — просто открываем редактор
         adapter.setOnItemClickListener(note -> openEditor(note));
 
-        // 4) Клик по «избранному»
+        // клик по «избранному»
         adapter.setOnFavoriteClickListener(note -> {
             boolean newFav = !note.isFavorite();
             note.setFavorite(newFav);
@@ -69,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             invalidateOptionsMenu();
         });
 
-        // 5) Свайп-влево — подтверждение и удаление
+        // свайп-влево — подтверждение и удаление
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override public boolean onMove(@NonNull RecyclerView rv,
                                             @NonNull RecyclerView.ViewHolder vh,
@@ -79,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int dir) {
                 int pos = vh.getAdapterPosition();
                 Note noteToDelete = adapter.getNoteAt(pos);
-                adapter.notifyItemChanged(pos); // отменяем визуальный свайп
+                adapter.notifyItemChanged(pos);
 
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle("Подтвердите удаление")
@@ -96,14 +93,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }).attachToRecyclerView(rv);
 
-        // 6) FAB — создание новой заметки
+        // создание новой заметки
         FloatingActionButton fab = findViewById(R.id.button_add_note);
         fab.setOnClickListener(v -> startActivityForResult(
                 new Intent(this, EditNoteActivity.class),
                 ADD_NOTE_REQUEST
         ));
 
-        // 7) Первичный показ списка
         loadNotes();
     }
 
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        // SearchView
+
         MenuItem si = menu.findItem(R.id.action_search);
         SearchView sv = (SearchView) si.getActionView();
         sv.setQueryHint("Поиск заметок…");
@@ -142,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Обновляем иконку/заголовок «Избранные»
         updateFavoriteUi(menu.findItem(R.id.action_favorite));
         return true;
     }

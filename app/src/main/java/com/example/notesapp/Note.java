@@ -19,14 +19,9 @@ public class Note {
     @ColumnInfo(name = "last_updated")
     private long lastUpdated;
 
-    // добавляем флаг «избранное»
     @ColumnInfo(name = "is_favorite")
     private boolean favorite;
 
-    // добавляем флаг «заблокирована»
-
-
-    // Полный конструктор
     public Note(String title,
                 String content,
                 long lastUpdated,
@@ -39,10 +34,9 @@ public class Note {
 
     }
 
-    // Пустой конструктор для Room
+
     public Note() { }
 
-    // Геттеры / Сеттеры
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

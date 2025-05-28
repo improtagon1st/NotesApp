@@ -10,6 +10,4 @@
     <string name="cd_tab_layout">Переключение между редактором и просмотром</string>
     <string name="cd_lock">Блокировать/разблокировать заметку</string>
     <string name="cd_favorite">Избранное</string>
-
-
 </resources>

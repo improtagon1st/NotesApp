@@ -15,7 +15,6 @@ public abstract class NotesDatabase extends RoomDatabase {
 
     public abstract NoteDao noteDao();
 
-    // Migration from v1 to v2: добавляем колонку is_locked
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
             db.execSQL("ALTER TABLE notes ADD COLUMN is_locked INTEGER NOT NULL DEFAULT 0");

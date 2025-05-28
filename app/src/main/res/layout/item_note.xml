@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- Заголовок -->
+
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="0dp"
@@ -26,7 +26,7 @@
             app:layout_constraintEnd_toStartOf="@+id/image_favorite"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <!-- Дата -->
+
         <TextView
             android:id="@+id/text_view_date"
             android:layout_width="0dp"
@@ -36,7 +36,6 @@
             app:layout_constraintEnd_toStartOf="@+id/image_favorite"
             app:layout_constraintTop_toBottomOf="@id/text_view_title"/>
 
-        <!-- Иконка «избранное» -->
         <ImageView
             android:id="@+id/image_favorite"
             android:layout_width="24dp"

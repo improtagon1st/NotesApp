@@ -41,10 +41,8 @@ dependencies {
 
     implementation("androidx.room:room-runtime:2.5.0")
     annotationProcessor("androidx.room:room-compiler:2.5.0")
-    // (room-ktx не обязателен для Java, но можно оставить)
     implementation("androidx.room:room-ktx:2.5.0")
 
-    // Lifecycle (ViewModel + LiveData)
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata:2.6.1")
     annotationProcessor("androidx.lifecycle:lifecycle-compiler:2.6.1")

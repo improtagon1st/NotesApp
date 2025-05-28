@@ -10,7 +10,6 @@
     android:orientation="vertical"
     android:padding="0dp">
 
-    <!-- 1) Заголовок заметки -->
     <EditText
         android:id="@+id/edit_text_title"
         android:layout_width="match_parent"
@@ -25,7 +24,6 @@
         android:textAppearance="?attr/textAppearanceHeadline6"
         tools:ignore="SpeakableTextDuplicate"/>
 
-    <!-- 2) Панель форматирования -->
     <LinearLayout
         android:id="@+id/format_panel"
         android:layout_width="match_parent"
@@ -69,7 +67,6 @@
 
     </LinearLayout>
 
-    <!-- 3) Вкладки -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
@@ -79,7 +76,6 @@
         app:tabIndicatorColor="?attr/colorPrimary"
         app:tabTextAppearance="@style/TextAppearance.MaterialComponents.Button"/>
 
-    <!-- 4) Контейнер редактора/превью -->
     <FrameLayout
         android:id="@+id/edit_container"
         android:layout_width="match_parent"
@@ -88,7 +84,6 @@
         android:clickable="true"
         android:foreground="?attr/selectableItemBackground">
 
-        <!-- a) Markdown-редактор -->
         <EditText
             android:id="@+id/edit_markdown"
             android:layout_width="match_parent"
@@ -103,7 +98,6 @@
             android:visibility="gone"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"/>
 
-        <!-- b) Превью -->
         <ScrollView
             android:id="@+id/scroll_preview"
             android:layout_width="match_parent"
@@ -121,7 +115,6 @@
 
     </FrameLayout>
 
-    <!-- 5) Кнопка «Сохранить» -->
     <Button
         android:id="@+id/button_save"
         android:layout_width="wrap_content"

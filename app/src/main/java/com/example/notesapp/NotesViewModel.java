@@ -20,7 +20,6 @@ public class NotesViewModel extends AndroidViewModel {
         favoriteNotes = repository.getFavoriteNotes();
     }
 
-    // Методы для MainActivity
     public LiveData<List<Note>> getAllNotes() {
         return allNotes;
     }

@@ -48,7 +48,7 @@ public class EditNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_note);
 
-        // 1) Инициализация Markwon
+        // инициализация Markwon
         markwon = Markwon.builder(this)
                 .usePlugin(CorePlugin.create())
                 .usePlugin(StrikethroughPlugin.create())
@@ -56,7 +56,6 @@ public class EditNoteActivity extends AppCompatActivity {
                 .usePlugin(LinkifyPlugin.create())
                 .build();
 
-        // 2) Связываем View
         editTextTitle  = findViewById(R.id.edit_text_title);
         editMarkdown   = findViewById(R.id.edit_markdown);
         formatPanel    = findViewById(R.id.format_panel);
@@ -66,7 +65,7 @@ public class EditNoteActivity extends AppCompatActivity {
         buttonSave     = findViewById(R.id.button_save);
         editContainer  = findViewById(R.id.edit_container);
 
-        // 3) Получаем данные из MainActivity
+        // получаем данные из MainActivity
         Intent in = getIntent();
         noteId      = in.getIntExtra(EXTRA_ID, -1);
         String title   = in.getStringExtra(EXTRA_TITLE);
@@ -81,11 +80,9 @@ public class EditNoteActivity extends AppCompatActivity {
             markwon.setMarkdown(textPreview, content);
         }
 
-        // 4) Настройка вкладок
         tabs.addTab(tabs.newTab().setText("Редактор"));
         tabs.addTab(tabs.newTab().setText("Превью"));
 
-        // По умолчанию — «Превью»
         tabs.getTabAt(1).select();
         enterPreviewMode();
 
@@ -101,14 +98,13 @@ public class EditNoteActivity extends AppCompatActivity {
             @Override public void onTabReselected(TabLayout.Tab tab) { }
         });
 
-        // 5) Клик по превью-контейнеру — переходим в редактор
         editContainer.setOnClickListener(v -> {
             if (tabs.getSelectedTabPosition() == 1) {
                 tabs.selectTab(tabs.getTabAt(0));
             }
         });
 
-        // 6) Кнопки форматирования
+        // кнопки форматирования
         findViewById(R.id.btn_heading).setOnClickListener(v ->
                 insertMarkdownAtCursor(editMarkdown, "## ", "")
         );
@@ -119,7 +115,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 insertMarkdownAtCursor(editMarkdown, "[текст](url)", "")
         );
 
-        // 7) Сохранение
+        // сохранение
         buttonSave.setOnClickListener(v -> {
             String newTitle   = editTextTitle.getText().toString().trim();
             String newContent = editMarkdown.getText().toString().trim();
